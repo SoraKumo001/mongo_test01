@@ -1,6 +1,6 @@
 import { setContext } from '@apollo/client/link/context';
 import { createContext, ReactNode, useContext, useMemo, useRef, useState } from 'react';
-import { decode, JwtPayload } from 'jsonwebtoken';
+import jwtDecode, { JwtPayload } from 'jwt-decode';
 import {
   ApolloClient,
   ApolloLink,
@@ -11,7 +11,6 @@ import {
 } from '@apollo/client';
 import { SSRCache } from './apollo-ssr';
 
-// eslint-disable-next-line no-unused-vars
 type AuthDispatch = (_: string | undefined) => void;
 type AuthType = { token?: string; info?: JwtPayload & { name: string }; setToken: AuthDispatch };
 
@@ -30,7 +29,7 @@ export const AuthApolloProvider = ({
   const property = useRef<{ client?: ApolloClient<NormalizedCacheObject> }>({}).current;
   const [token, setToken] = useState<string>(initToken);
   const info = useMemo(() => {
-    return decode(token) as JwtPayload & { name: string };
+    return jwtDecode(token) as JwtPayload & { name: string };
   }, [token]);
   const refToken = useRef(token);
 

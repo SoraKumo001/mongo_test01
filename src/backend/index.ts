@@ -23,6 +23,7 @@ const getAuth = (req: NextApiRequest) => {
 const connect = async () => {
   mongoose.set('strictQuery', false);
   const uri = process.env.MONGO_URI ?? 'mongodb://root:password@localhost';
+  console.log(uri);
   const dbName = process.env.MONGO_DB ?? 'database';
   await mongoose.connect(uri, { dbName });
 };

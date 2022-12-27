@@ -4,7 +4,9 @@
   "main": "index.js",
   "license": "MIT",
   "scripts": {
+    "start": "next start",
     "dev": "yarn docker:start && next",
+    "build": "next build",
     "docker:start": "docker compose -f docker/docker-compose.yml up -d",
     "lint:fix": "next lint --fix && prettier -w src",
     "generate": "graphql-codegen --config graphql/codegen.json"
@@ -17,6 +19,7 @@
     "graphql-compose": "^9.0.10",
     "graphql-compose-mongoose": "^9.7.2",
     "jsonwebtoken": "^9.0.0",
+    "jwt-decode": "^3.1.2",
     "micro": "^10.0.1",
     "mongoose": "^6.8.1",
     "next": "^13.1.1",
@@ -32,7 +35,6 @@
     "@types/cookie": "^0.5.1",
     "@types/jsonwebtoken": "^9.0.0",
     "@types/react": "18.0.26",
-    "@typescript-eslint/eslint-plugin": "^5.47.0",
     "eslint": "8.30.0",
     "eslint-config-next": "13.1.1",
     "eslint-config-prettier": "^8.5.0",
