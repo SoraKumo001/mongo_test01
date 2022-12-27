@@ -27,9 +27,16 @@ export const AuthApolloProvider = ({
   children: ReactNode;
 }) => {
   const property = useRef<{ client?: ApolloClient<NormalizedCacheObject> }>({}).current;
-  const [token, setToken] = useState<string>(initToken);
+  const [token, setToken] = useState<string>(() => {
+    return initToken;
+  });
   const info = useMemo(() => {
-    return jwtDecode(token) as JwtPayload & { name: string };
+    try {
+      if (token) {
+        return jwtDecode(token) as JwtPayload & { name: string };
+      }
+    } catch (_) {}
+    return undefined;
   }, [token]);
   const refToken = useRef(token);
 
