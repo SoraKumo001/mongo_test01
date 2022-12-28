@@ -3,12 +3,10 @@ import { ApolloServer, HeaderMap } from '@apollo/server';
 import { ApolloServerPluginLandingPageLocalDefault } from '@apollo/server/plugin/landingPage/default';
 import { InMemoryLRUCache } from '@apollo/utils.keyvaluecache';
 import { verify } from 'jsonwebtoken';
-import { parse } from 'url';
-import getRawBody from 'raw-body';
-
 import schema from './schema';
 
 import mongoose from 'mongoose';
+import formidable from 'formidable';
 
 const getAuth = (req: NextApiRequest) => {
   const authorization = req.headers['authorization'];
@@ -41,36 +39,47 @@ const apolloServer = new ApolloServer<ApolloContext>({
 
 const startServer = apolloServer.start();
 
+const createRequest = (fields: formidable.Fields, file: formidable.Files) => {
+  if ('operations' in fields && 'map' in fields) {
+    if (typeof fields.operations !== 'string' || typeof fields.map !== 'string') {
+      throw 'Upload type error';
+    }
+    const request = JSON.parse(fields.operations);
+    const map: { [key: string]: [string] } = JSON.parse(fields.map);
+    Object.entries(map).forEach(([key, [value]]) => {
+      value.split('.').reduce((a, b, index, array) => {
+        if (array.length - 1 === index) a[b] = file[key];
+        else return a[b];
+      }, request);
+    });
+    return request;
+  }
+  return fields;
+};
+
 const handler = async (req: NextApiRequest, res: NextApiResponse) => {
   await startServer;
   const headers = new HeaderMap();
   Object.entries(req.headers).forEach(([key, value]) => {
     headers.set(key, Array.isArray(value) ? value[0] : value);
   });
-  const body = JSON.parse((await getRawBody(req)).toString());
-  const result = await apolloServer.executeHTTPGraphQLRequest({
-    httpGraphQLRequest: {
-      method: req.method.toUpperCase(),
-      headers: headers,
-      body,
-      search: parse(req.url).search ?? '',
-    },
-    context: async () => {
+  const form = formidable();
+  await new Promise<void>((resolve) => {
+    form.parse(req, async (_, fields, file) => {
       const user = getAuth(req);
-      return { req, res, user };
-    },
-  });
-  if (result.body.kind === 'complete') {
-    res.end(result.body.string);
-  } else {
-    for await (const chunk of result.body.asyncIterator) {
-      res.write(chunk);
-      if (typeof (res as any).flush === 'function') {
-        (res as any).flush();
+      const request = createRequest(fields, file);
+      const result = await apolloServer.executeOperation(request, {
+        contextValue: { req, res, user },
+      });
+      if (result.body.kind === 'single') {
+        result.http.headers.forEach((value, key) => {
+          res.setHeader(key, value);
+        });
+        res.json(result.body.singleResult);
       }
-    }
-    res.end();
-  }
+      resolve();
+    });
+  });
 };
 
 export default handler;

@@ -78,7 +78,6 @@ schemaComposer.Mutation.addFields({
       },
     ]).removeArg(['record:user']), // データ作成1件
   }),
-  messageCreateMany: Message.getResolver('createMany'), // データ作成複数件
   messageUpdateById: Message.getResolver('updateById'), // IDでのデータ更新
   messageRemoveById: Message.getResolver('removeById'), // IDでのデータ削除
 });

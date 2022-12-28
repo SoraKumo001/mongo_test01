@@ -1,4 +1,5 @@
 import { setContext } from '@apollo/client/link/context';
+import { createUploadLink } from 'apollo-upload-client';
 import { createContext, ReactNode, useContext, useMemo, useRef, useState } from 'react';
 import jwtDecode, { JwtPayload } from 'jwt-decode';
 import {
@@ -41,6 +42,7 @@ export const AuthApolloProvider = ({
   const refToken = useRef(token);
 
   if (!property.client) {
+    const uploadLink = createUploadLink({ uri, fetch }) as unknown as ApolloLink;
     const authLink = setContext(() => {
       const token = refToken.current;
       return (
@@ -50,7 +52,7 @@ export const AuthApolloProvider = ({
           },
         }
       );
-    });
+    }).concat(uploadLink);
 
     property.client = new ApolloClient({
       uri,

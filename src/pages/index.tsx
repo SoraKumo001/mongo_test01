@@ -4,6 +4,7 @@ import {
   MessageManyDocument,
   MessageManyQuery,
   MessageManyQueryVariables,
+  useCreateFileMutation,
   useLoginMutation,
   useLogoutMutation,
   useMessageCreateMutation,
@@ -19,11 +20,24 @@ const Page = () => {
   const [login] = useLoginMutation();
   const [logout] = useLogoutMutation();
   const [createMessage] = useMessageCreateMutation();
+  const [createFile] = useCreateFileMutation();
   return (
     <div>
       <div>
         <Link href="/api/graphql">GraphQL Explorer</Link>
       </div>
+      <button
+        onClick={() => {
+          const file = new Blob(['test'], { type: 'text/plain' });
+          createFile({
+            variables: {
+              file,
+            },
+          });
+        }}
+      >
+        create
+      </button>
       {!info ? (
         <form
           onSubmit={(e) => {
