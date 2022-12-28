@@ -1,8 +1,10 @@
-import { ApolloServer } from 'apollo-server-micro';
 import type { NextApiRequest, NextApiResponse } from 'next';
-import { ApolloServerPluginLandingPageLocalDefault } from 'apollo-server-core';
+import { ApolloServer, HeaderMap } from '@apollo/server';
+import { ApolloServerPluginLandingPageLocalDefault } from '@apollo/server/plugin/landingPage/default';
 import { InMemoryLRUCache } from '@apollo/utils.keyvaluecache';
 import { verify } from 'jsonwebtoken';
+import { parse } from 'url';
+import getRawBody from 'raw-body';
 
 import schema from './schema';
 
@@ -29,23 +31,46 @@ const connect = async () => {
 };
 connect();
 
-const apolloServer = new ApolloServer({
+type ApolloContext = { req: NextApiRequest; res: NextApiResponse; user?: string };
+
+const apolloServer = new ApolloServer<ApolloContext>({
   schema,
   cache: new InMemoryLRUCache(),
   plugins: [ApolloServerPluginLandingPageLocalDefault({ embed: true })],
-  context: ({ req, res }: { req: NextApiRequest; res: NextApiResponse }) => {
-    const user = getAuth(req);
-    return { req, res, user };
-  },
 });
 
 const startServer = apolloServer.start();
 
 const handler = async (req: NextApiRequest, res: NextApiResponse) => {
   await startServer;
-  await apolloServer.createHandler({
-    path: req.url,
-  })(req, res);
+  const headers = new HeaderMap();
+  Object.entries(req.headers).forEach(([key, value]) => {
+    headers.set(key, Array.isArray(value) ? value[0] : value);
+  });
+  const body = JSON.parse((await getRawBody(req)).toString());
+  const result = await apolloServer.executeHTTPGraphQLRequest({
+    httpGraphQLRequest: {
+      method: req.method.toUpperCase(),
+      headers: headers,
+      body,
+      search: parse(req.url).search ?? '',
+    },
+    context: async () => {
+      const user = getAuth(req);
+      return { req, res, user };
+    },
+  });
+  if (result.body.kind === 'complete') {
+    res.end(result.body.string);
+  } else {
+    for await (const chunk of result.body.asyncIterator) {
+      res.write(chunk);
+      if (typeof (res as any).flush === 'function') {
+        (res as any).flush();
+      }
+    }
+    res.end();
+  }
 };
 
 export default handler;
