@@ -79,7 +79,7 @@ schemaComposer.Mutation.addFields({
   logout: {
     name: 'logout',
     type: 'String!',
-    resolve: async (_, args, context) => {
+    resolve: async (_, _args, context) => {
       const res: NextApiResponse = context.res;
       res.setHeader(
         'Set-Cookie',
