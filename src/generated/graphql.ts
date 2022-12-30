@@ -127,27 +127,22 @@ export type Mutation = {
   messageUpdateById?: Maybe<UpdateByIdMessagePayload>;
 };
 
-
 export type MutationCreateFileArgs = {
   file: Scalars['Upload'];
 };
-
 
 export type MutationLoginArgs = {
   identity: Scalars['String'];
   password: Scalars['String'];
 };
 
-
 export type MutationMessageCreateArgs = {
   record: CreateOneMessageInput;
 };
 
-
 export type MutationMessageRemoveByIdArgs = {
   _id: Scalars['MongoID'];
 };
-
 
 export type MutationMessageUpdateByIdArgs = {
   _id: Scalars['MongoID'];
@@ -158,25 +153,17 @@ export type Query = {
   __typename?: 'Query';
   messageById?: Maybe<Message>;
   messageMany: Array<Message>;
-  userById?: Maybe<User>;
 };
-
 
 export type QueryMessageByIdArgs = {
   _id: Scalars['MongoID'];
 };
-
 
 export type QueryMessageManyArgs = {
   filter?: InputMaybe<FilterFindManyMessageInput>;
   limit?: InputMaybe<Scalars['Int']>;
   skip?: InputMaybe<Scalars['Int']>;
   sort?: InputMaybe<SortFindManyMessageInput>;
-};
-
-
-export type QueryUserByIdArgs = {
-  _id: Scalars['MongoID'];
 };
 
 export type RemoveByIdMessagePayload = {
@@ -201,7 +188,7 @@ export enum SortFindManyMessageInput {
   UpdatedatAsc = 'UPDATEDAT_ASC',
   UpdatedatDesc = 'UPDATEDAT_DESC',
   IdAsc = '_ID_ASC',
-  IdDesc = '_ID_DESC'
+  IdDesc = '_ID_DESC',
 }
 
 export type UpdateByIdMessageInput = {
@@ -253,43 +240,66 @@ export type CreateFileMutationVariables = Exact<{
   file: Scalars['Upload'];
 }>;
 
-
-export type CreateFileMutation = { __typename?: 'Mutation', createFile: string };
+export type CreateFileMutation = { __typename?: 'Mutation'; createFile: string };
 
 export type LoginMutationVariables = Exact<{
   identity: Scalars['String'];
   password: Scalars['String'];
 }>;
 
+export type LoginMutation = { __typename?: 'Mutation'; login?: string | null };
 
-export type LoginMutation = { __typename?: 'Mutation', login?: string | null };
+export type LogoutMutationVariables = Exact<{ [key: string]: never }>;
 
-export type LogoutMutationVariables = Exact<{ [key: string]: never; }>;
-
-
-export type LogoutMutation = { __typename?: 'Mutation', logout: string };
+export type LogoutMutation = { __typename?: 'Mutation'; logout: string };
 
 export type MessageManyQueryVariables = Exact<{
   filter?: InputMaybe<FilterFindManyMessageInput>;
 }>;
 
-
-export type MessageManyQuery = { __typename?: 'Query', messageMany: Array<{ __typename?: 'Message', _id: any, public: boolean, title: string, message: string, createdAt?: any | null, updatedAt?: any | null, user: { __typename?: 'User', _id: any, name: string } }> };
+export type MessageManyQuery = {
+  __typename?: 'Query';
+  messageMany: Array<{
+    __typename?: 'Message';
+    _id: any;
+    public: boolean;
+    title: string;
+    message: string;
+    createdAt?: any | null;
+    updatedAt?: any | null;
+    user: { __typename?: 'User'; _id: any; name: string };
+  }>;
+};
 
 export type MessageCreateMutationVariables = Exact<{
   record: CreateOneMessageInput;
 }>;
 
-
-export type MessageCreateMutation = { __typename?: 'Mutation', messageCreate?: { __typename?: 'CreateOneMessagePayload', record?: { __typename?: 'Message', _id: any, public: boolean, title: string, message: string, createdAt?: any | null, updatedAt?: any | null } | null } | null };
-
+export type MessageCreateMutation = {
+  __typename?: 'Mutation';
+  messageCreate?: {
+    __typename?: 'CreateOneMessagePayload';
+    record?: {
+      __typename?: 'Message';
+      _id: any;
+      public: boolean;
+      title: string;
+      message: string;
+      createdAt?: any | null;
+      updatedAt?: any | null;
+    } | null;
+  } | null;
+};
 
 export const CreateFileDocument = gql`
-    mutation CreateFile($file: Upload!) {
-  createFile(file: $file)
-}
-    `;
-export type CreateFileMutationFn = Apollo.MutationFunction<CreateFileMutation, CreateFileMutationVariables>;
+  mutation CreateFile($file: Upload!) {
+    createFile(file: $file)
+  }
+`;
+export type CreateFileMutationFn = Apollo.MutationFunction<
+  CreateFileMutation,
+  CreateFileMutationVariables
+>;
 
 /**
  * __useCreateFileMutation__
@@ -308,18 +318,26 @@ export type CreateFileMutationFn = Apollo.MutationFunction<CreateFileMutation, C
  *   },
  * });
  */
-export function useCreateFileMutation(baseOptions?: Apollo.MutationHookOptions<CreateFileMutation, CreateFileMutationVariables>) {
-        const options = {...defaultOptions, ...baseOptions}
-        return Apollo.useMutation<CreateFileMutation, CreateFileMutationVariables>(CreateFileDocument, options);
-      }
+export function useCreateFileMutation(
+  baseOptions?: Apollo.MutationHookOptions<CreateFileMutation, CreateFileMutationVariables>
+) {
+  const options = { ...defaultOptions, ...baseOptions };
+  return Apollo.useMutation<CreateFileMutation, CreateFileMutationVariables>(
+    CreateFileDocument,
+    options
+  );
+}
 export type CreateFileMutationHookResult = ReturnType<typeof useCreateFileMutation>;
 export type CreateFileMutationResult = Apollo.MutationResult<CreateFileMutation>;
-export type CreateFileMutationOptions = Apollo.BaseMutationOptions<CreateFileMutation, CreateFileMutationVariables>;
+export type CreateFileMutationOptions = Apollo.BaseMutationOptions<
+  CreateFileMutation,
+  CreateFileMutationVariables
+>;
 export const LoginDocument = gql`
-    mutation Login($identity: String!, $password: String!) {
-  login(identity: $identity, password: $password)
-}
-    `;
+  mutation Login($identity: String!, $password: String!) {
+    login(identity: $identity, password: $password)
+  }
+`;
 export type LoginMutationFn = Apollo.MutationFunction<LoginMutation, LoginMutationVariables>;
 
 /**
@@ -340,18 +358,23 @@ export type LoginMutationFn = Apollo.MutationFunction<LoginMutation, LoginMutati
  *   },
  * });
  */
-export function useLoginMutation(baseOptions?: Apollo.MutationHookOptions<LoginMutation, LoginMutationVariables>) {
-        const options = {...defaultOptions, ...baseOptions}
-        return Apollo.useMutation<LoginMutation, LoginMutationVariables>(LoginDocument, options);
-      }
+export function useLoginMutation(
+  baseOptions?: Apollo.MutationHookOptions<LoginMutation, LoginMutationVariables>
+) {
+  const options = { ...defaultOptions, ...baseOptions };
+  return Apollo.useMutation<LoginMutation, LoginMutationVariables>(LoginDocument, options);
+}
 export type LoginMutationHookResult = ReturnType<typeof useLoginMutation>;
 export type LoginMutationResult = Apollo.MutationResult<LoginMutation>;
-export type LoginMutationOptions = Apollo.BaseMutationOptions<LoginMutation, LoginMutationVariables>;
+export type LoginMutationOptions = Apollo.BaseMutationOptions<
+  LoginMutation,
+  LoginMutationVariables
+>;
 export const LogoutDocument = gql`
-    mutation Logout {
-  logout
-}
-    `;
+  mutation Logout {
+    logout
+  }
+`;
 export type LogoutMutationFn = Apollo.MutationFunction<LogoutMutation, LogoutMutationVariables>;
 
 /**
@@ -370,29 +393,34 @@ export type LogoutMutationFn = Apollo.MutationFunction<LogoutMutation, LogoutMut
  *   },
  * });
  */
-export function useLogoutMutation(baseOptions?: Apollo.MutationHookOptions<LogoutMutation, LogoutMutationVariables>) {
-        const options = {...defaultOptions, ...baseOptions}
-        return Apollo.useMutation<LogoutMutation, LogoutMutationVariables>(LogoutDocument, options);
-      }
+export function useLogoutMutation(
+  baseOptions?: Apollo.MutationHookOptions<LogoutMutation, LogoutMutationVariables>
+) {
+  const options = { ...defaultOptions, ...baseOptions };
+  return Apollo.useMutation<LogoutMutation, LogoutMutationVariables>(LogoutDocument, options);
+}
 export type LogoutMutationHookResult = ReturnType<typeof useLogoutMutation>;
 export type LogoutMutationResult = Apollo.MutationResult<LogoutMutation>;
-export type LogoutMutationOptions = Apollo.BaseMutationOptions<LogoutMutation, LogoutMutationVariables>;
+export type LogoutMutationOptions = Apollo.BaseMutationOptions<
+  LogoutMutation,
+  LogoutMutationVariables
+>;
 export const MessageManyDocument = gql`
-    query MessageMany($filter: FilterFindManyMessageInput) {
-  messageMany(filter: $filter, sort: CREATEDAT_DESC) {
-    _id
-    public
-    title
-    message
-    createdAt
-    updatedAt
-    user {
+  query MessageMany($filter: FilterFindManyMessageInput) {
+    messageMany(filter: $filter, sort: CREATEDAT_DESC) {
       _id
-      name
+      public
+      title
+      message
+      createdAt
+      updatedAt
+      user {
+        _id
+        name
+      }
     }
   }
-}
-    `;
+`;
 
 /**
  * __useMessageManyQuery__
@@ -410,32 +438,45 @@ export const MessageManyDocument = gql`
  *   },
  * });
  */
-export function useMessageManyQuery(baseOptions?: Apollo.QueryHookOptions<MessageManyQuery, MessageManyQueryVariables>) {
-        const options = {...defaultOptions, ...baseOptions}
-        return Apollo.useQuery<MessageManyQuery, MessageManyQueryVariables>(MessageManyDocument, options);
-      }
-export function useMessageManyLazyQuery(baseOptions?: Apollo.LazyQueryHookOptions<MessageManyQuery, MessageManyQueryVariables>) {
-          const options = {...defaultOptions, ...baseOptions}
-          return Apollo.useLazyQuery<MessageManyQuery, MessageManyQueryVariables>(MessageManyDocument, options);
-        }
+export function useMessageManyQuery(
+  baseOptions?: Apollo.QueryHookOptions<MessageManyQuery, MessageManyQueryVariables>
+) {
+  const options = { ...defaultOptions, ...baseOptions };
+  return Apollo.useQuery<MessageManyQuery, MessageManyQueryVariables>(MessageManyDocument, options);
+}
+export function useMessageManyLazyQuery(
+  baseOptions?: Apollo.LazyQueryHookOptions<MessageManyQuery, MessageManyQueryVariables>
+) {
+  const options = { ...defaultOptions, ...baseOptions };
+  return Apollo.useLazyQuery<MessageManyQuery, MessageManyQueryVariables>(
+    MessageManyDocument,
+    options
+  );
+}
 export type MessageManyQueryHookResult = ReturnType<typeof useMessageManyQuery>;
 export type MessageManyLazyQueryHookResult = ReturnType<typeof useMessageManyLazyQuery>;
-export type MessageManyQueryResult = Apollo.QueryResult<MessageManyQuery, MessageManyQueryVariables>;
+export type MessageManyQueryResult = Apollo.QueryResult<
+  MessageManyQuery,
+  MessageManyQueryVariables
+>;
 export const MessageCreateDocument = gql`
-    mutation MessageCreate($record: CreateOneMessageInput!) {
-  messageCreate(record: $record) {
-    record {
-      _id
-      public
-      title
-      message
-      createdAt
-      updatedAt
+  mutation MessageCreate($record: CreateOneMessageInput!) {
+    messageCreate(record: $record) {
+      record {
+        _id
+        public
+        title
+        message
+        createdAt
+        updatedAt
+      }
     }
   }
-}
-    `;
-export type MessageCreateMutationFn = Apollo.MutationFunction<MessageCreateMutation, MessageCreateMutationVariables>;
+`;
+export type MessageCreateMutationFn = Apollo.MutationFunction<
+  MessageCreateMutation,
+  MessageCreateMutationVariables
+>;
 
 /**
  * __useMessageCreateMutation__
@@ -454,10 +495,18 @@ export type MessageCreateMutationFn = Apollo.MutationFunction<MessageCreateMutat
  *   },
  * });
  */
-export function useMessageCreateMutation(baseOptions?: Apollo.MutationHookOptions<MessageCreateMutation, MessageCreateMutationVariables>) {
-        const options = {...defaultOptions, ...baseOptions}
-        return Apollo.useMutation<MessageCreateMutation, MessageCreateMutationVariables>(MessageCreateDocument, options);
-      }
+export function useMessageCreateMutation(
+  baseOptions?: Apollo.MutationHookOptions<MessageCreateMutation, MessageCreateMutationVariables>
+) {
+  const options = { ...defaultOptions, ...baseOptions };
+  return Apollo.useMutation<MessageCreateMutation, MessageCreateMutationVariables>(
+    MessageCreateDocument,
+    options
+  );
+}
 export type MessageCreateMutationHookResult = ReturnType<typeof useMessageCreateMutation>;
 export type MessageCreateMutationResult = Apollo.MutationResult<MessageCreateMutation>;
-export type MessageCreateMutationOptions = Apollo.BaseMutationOptions<MessageCreateMutation, MessageCreateMutationVariables>;
+export type MessageCreateMutationOptions = Apollo.BaseMutationOptions<
+  MessageCreateMutation,
+  MessageCreateMutationVariables
+>;

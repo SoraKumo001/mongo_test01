@@ -1,8 +1,9 @@
-import type { AppContext, AppProps } from 'next/app';
-import { Suspense } from 'react';
-import { SSRProvider } from '../libs/apollo-ssr';
-import { AuthApolloProvider } from '../libs/apollo-auth';
+import { ApolloProvider } from '@apollo/client';
 import { parse } from 'cookie';
+import { Suspense } from 'react';
+import { createApolloClient } from '../libs/apollo-auth';
+import { SSRCache, SSRProvider } from '../libs/apollo-ssr';
+import type { AppContext, AppProps } from 'next/app';
 
 const endpoint = '/api/graphql';
 const uri =
@@ -13,14 +14,15 @@ const uri =
     : endpoint;
 
 const App = ({ Component, pageProps, token }: AppProps & { token: string }) => {
+  const client = createApolloClient({ uri, token });
   return (
-    <AuthApolloProvider uri={uri} token={token}>
+    <ApolloProvider client={client} suspenseCache={new SSRCache()}>
       <SSRProvider>
         <Suspense fallback={'Loading'}>
           <Component {...pageProps} />
         </Suspense>
       </SSRProvider>
-    </AuthApolloProvider>
+    </ApolloProvider>
   );
 };
 

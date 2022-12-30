@@ -1,24 +1,15 @@
-import { parse } from 'url';
 import { promises as fs } from 'fs';
-import type { NextApiRequest, NextApiResponse } from 'next';
-import { ApolloServer, GraphQLRequest, HeaderMap } from '@apollo/server';
-import { ApolloServerPluginLandingPageLocalDefault } from '@apollo/server/plugin/landingPage/default';
-import { verify } from 'jsonwebtoken';
+import { parse } from 'url';
+import { GraphQLRequest, HeaderMap } from '@apollo/server';
 import formidable from 'formidable';
-import { schema } from '../schema';
-import type { ApolloServerContext } from '../types';
-
-const apolloServer = new ApolloServer<ApolloServerContext>({
-  schema,
-  plugins: [ApolloServerPluginLandingPageLocalDefault({ embed: true })],
-});
-
-apolloServer.start();
+import { verify } from 'jsonwebtoken';
+import type { NextApiRequest } from 'next';
 
 /**
  * authorizationヘッダからBearerトークンを取得する
+ * @returns token
  */
-const getAuth = (req: NextApiRequest) => {
+export const getAuth = (req: NextApiRequest) => {
   const authorization = req.headers['authorization'];
   const token = authorization?.match(/^Bearer[ ]+([^ ]+)[ ]*$/i)?.[1];
   if (token) {
@@ -32,12 +23,32 @@ const getAuth = (req: NextApiRequest) => {
 };
 
 /**
- * GraphQLのリクエストをmultipart/form-data 対応にする
- *
- * Response
- * [executeHTTPGraphQLRequestに設定するbody,一時ファイル削除用ファンクション]
+ * NextApiRequestをApolloのHeaderに変換する
+ * 馬鹿丁寧に変換していますが、同一ヘッダ名は後の値が上書き
+ * @returns HeaderMap形式のヘッダ
  */
-const createGraphQLRequest = (req: NextApiRequest) => {
+export const createHeaders = (req: NextApiRequest) =>
+  new HeaderMap(
+    Object.entries(req.headers).flatMap<[string, string]>(([key, value]) =>
+      Array.isArray(value)
+        ? value.flatMap<[string, string]>((v) => (v ? [[key, v]] : []))
+        : value
+        ? [[key, value]]
+        : []
+    )
+  );
+
+/**
+ * NextApiRequestからsearchを取り出す
+ * @returns search
+ */
+export const createSearch = (req: NextApiRequest) => parse(req.url ?? '').search ?? '';
+
+/**
+ * GraphQLのリクエストをmultipart/form-data 対応にする
+ * @returns [executeHTTPGraphQLRequestに設定するbody,一時ファイル削除用ファンクション]
+ */
+export const createGraphQLRequest = (req: NextApiRequest) => {
   const form = formidable();
   return new Promise<[GraphQLRequest, () => void]>((resolve, reject) => {
     form.parse(req, async (_, fields, files) => {
@@ -76,34 +87,4 @@ const createGraphQLRequest = (req: NextApiRequest) => {
       }
     });
   });
-};
-
-export const apolloHandler = async (req: NextApiRequest, res: NextApiResponse) => {
-  const headers = new HeaderMap();
-  Object.entries(req.headers).forEach(([key, value]) => {
-    headers.set(key, (Array.isArray(value) ? value[0] : value) ?? '');
-  });
-  const [body, removeFiles] = await createGraphQLRequest(req);
-  try {
-    const user = getAuth(req);
-    const result = await apolloServer.executeHTTPGraphQLRequest({
-      httpGraphQLRequest: {
-        method: req.method ?? '',
-        headers,
-        search: parse(req.url ?? '').search ?? '',
-        body,
-      },
-      context: async () => ({ req, res, user }),
-    });
-    if (result.body.kind === 'complete') {
-      res.end(result.body.string);
-    } else {
-      for await (const chunk of result.body.asyncIterator) {
-        res.write(chunk);
-      }
-      res.end();
-    }
-  } finally {
-    removeFiles();
-  }
 };

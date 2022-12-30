@@ -1,5 +1,3 @@
-import { useRef, useEffect, useCallback, useMemo, useState, useLayoutEffect } from 'react';
-import { equal } from '@wry/equality';
 import {
   ApolloClient,
   ApolloError,
@@ -11,14 +9,16 @@ import {
   WatchQueryOptions,
   WatchQueryFetchPolicy,
 } from '@apollo/client/core';
-import { invariant } from '@apollo/client/utilities/globals';
-import { compact, Concast, isNonEmptyArray, hasDirectives } from '@apollo/client/utilities';
-import { useApolloClient } from '@apollo/client/react/hooks/useApolloClient';
-import { DocumentType, verifyDocumentType } from '@apollo/client/react/parser';
-import { SuspenseQueryHookOptions, ObservableQueryFields } from '@apollo/client/react/types/types';
 import { useDeepMemo } from '@apollo/client/react/hooks/internal';
+import { useApolloClient } from '@apollo/client/react/hooks/useApolloClient';
 import { useSuspenseCache } from '@apollo/client/react/hooks/useSuspenseCache';
 import { useSyncExternalStore } from '@apollo/client/react/hooks/useSyncExternalStore';
+import { DocumentType, verifyDocumentType } from '@apollo/client/react/parser';
+import { SuspenseQueryHookOptions, ObservableQueryFields } from '@apollo/client/react/types/types';
+import { compact, Concast, isNonEmptyArray, hasDirectives } from '@apollo/client/utilities';
+import { invariant } from '@apollo/client/utilities/globals';
+import { equal } from '@wry/equality';
+import { useRef, useEffect, useCallback, useMemo, useState, useLayoutEffect } from 'react';
 
 export interface UseSuspenseQueryResult<TData = any, TVariables = OperationVariables> {
   data: TData;

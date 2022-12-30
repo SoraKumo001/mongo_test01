@@ -1,10 +1,10 @@
+import cookie from 'cookie';
 import { schemaComposer } from 'graphql-compose';
 import { composeWithMongoose } from 'graphql-compose-mongoose';
 import { sign } from 'jsonwebtoken';
 import { model, Schema } from 'mongoose';
 import { NextApiResponse } from 'next';
 import { createHash } from '../../libs/tools';
-import cookie from 'cookie';
 import { UserModel } from './model';
 
 export const initUser = () => {

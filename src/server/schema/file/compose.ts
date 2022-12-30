@@ -1,6 +1,6 @@
+import fs from 'fs';
 import { schemaComposer } from 'graphql-compose';
 import { composeWithMongoose } from 'graphql-compose-mongoose';
-import fs from 'fs';
 import { FileModel } from './model';
 
 export const initFile = () => {

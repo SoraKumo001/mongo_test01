@@ -1,4 +1,3 @@
-//import { useSuspenseQuery_experimental as useSuspenseQuery } from '@apollo/client';
 import Link from 'next/link';
 import {
   MessageManyDocument,
@@ -9,22 +8,20 @@ import {
   useLogoutMutation,
   useMessageCreateMutation,
 } from '../generated/graphql';
-import { useAuth } from '../libs/apollo-auth';
+import { useAuthInfo, useAuthToken } from '../libs/apollo-auth';
 import { useSuspenseQuery } from '../libs/useSuspenseQuery';
-//import { QUERY_TOKEN } from '../query/test';
 
 const Page = () => {
   const { data, refetch } = useSuspenseQuery<MessageManyQuery, MessageManyQueryVariables>(
     MessageManyDocument,
     { suspensePolicy: 'initial' }
   );
-  const { setToken, info } = useAuth();
+  const info = useAuthInfo();
+  const setToken = useAuthToken();
   const [login] = useLoginMutation();
   const [logout] = useLogoutMutation();
   const [createMessage] = useMessageCreateMutation();
   const [createFile] = useCreateFileMutation();
-  // const { data: data2, error } = useQuery(QUERY_TOKEN);
-  // console.log(data2, error);
   return (
     <div>
       <div>

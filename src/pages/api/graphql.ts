@@ -1,1 +1,7 @@
-export { default, config } from '../../server';
+export { default } from '../../server';
+
+export const config = {
+  api: {
+    bodyParser: false,
+  },
+};
