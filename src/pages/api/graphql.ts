@@ -1,1 +1,1 @@
-export { default, config } from '../../backend';
+export { default, config } from '../../server';

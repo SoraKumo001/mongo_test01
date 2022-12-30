@@ -58,10 +58,10 @@ const DataRender = () => {
   );
 };
 
-export const initApolloCache = <T,>(clinet: ApolloClient<T>) => {
+export const initApolloCache = <T,>(client: ApolloClient<T>) => {
   if (typeof window !== 'undefined') {
     const node = document.getElementById(DATA_NAME);
-    if (node) clinet.restore(JSON.parse(node.innerHTML));
+    if (node) client.restore(JSON.parse(node.innerHTML));
   }
 };
 

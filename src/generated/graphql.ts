@@ -103,7 +103,7 @@ export type Message = {
   public: Scalars['Boolean'];
   title: Scalars['String'];
   updatedAt?: Maybe<Scalars['Date']>;
-  user?: Maybe<User>;
+  user: User;
 };
 
 export type MongoError = ErrorInterface & {
@@ -274,7 +274,7 @@ export type MessageManyQueryVariables = Exact<{
 }>;
 
 
-export type MessageManyQuery = { __typename?: 'Query', messageMany: Array<{ __typename?: 'Message', _id: any, public: boolean, title: string, message: string, createdAt?: any | null, updatedAt?: any | null, user?: { __typename?: 'User', _id: any, name: string } | null }> };
+export type MessageManyQuery = { __typename?: 'Query', messageMany: Array<{ __typename?: 'Message', _id: any, public: boolean, title: string, message: string, createdAt?: any | null, updatedAt?: any | null, user: { __typename?: 'User', _id: any, name: string } }> };
 
 export type MessageCreateMutationVariables = Exact<{
   record: CreateOneMessageInput;
