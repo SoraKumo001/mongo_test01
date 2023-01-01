@@ -1,27 +1,21 @@
 import Link from 'next/link';
 import {
-  MessageManyDocument,
-  MessageManyQuery,
-  MessageManyQueryVariables,
   useCreateFileMutation,
   useLoginMutation,
   useLogoutMutation,
   useMessageCreateMutation,
+  useMessageManyQuery,
 } from '../generated/graphql';
-import { useAuthInfo, useAuthToken } from '../libs/apollo-auth';
-import { useSuspenseQuery } from '../libs/useSuspenseQuery';
+import { useAuthInfo, useAuthToken } from '../libs/auth-provider';
 
 const Page = () => {
-  const { data, refetch } = useSuspenseQuery<MessageManyQuery, MessageManyQueryVariables>(
-    MessageManyDocument,
-    { suspensePolicy: 'initial' }
-  );
+  const [{ data }, refetch] = useMessageManyQuery();
   const info = useAuthInfo();
   const setToken = useAuthToken();
-  const [login] = useLoginMutation();
-  const [logout] = useLogoutMutation();
-  const [createMessage] = useMessageCreateMutation();
-  const [createFile] = useCreateFileMutation();
+  const [, login] = useLoginMutation();
+  const [, logout] = useLogoutMutation();
+  const [, createMessage] = useMessageCreateMutation();
+  const [, createFile] = useCreateFileMutation();
   return (
     <div>
       <div>
@@ -31,9 +25,7 @@ const Page = () => {
         onClick={() => {
           const file = new Blob(['test'], { type: 'text/plain' });
           createFile({
-            variables: {
-              file,
-            },
+            file,
           });
         }}
       >
@@ -45,7 +37,7 @@ const Page = () => {
             const node = e.currentTarget;
             const identity = node.identity.value;
             const password = node.password.value;
-            login({ variables: { identity, password } }).then(({ data }) => {
+            login({ identity, password }).then(({ data }) => {
               if (data?.login) {
                 setToken(data.login);
               }
@@ -61,7 +53,7 @@ const Page = () => {
         <div>
           <button
             onClick={() => {
-              logout().then(() => {
+              logout({}).then(() => {
                 setToken(undefined);
               });
             }}
@@ -80,11 +72,11 @@ const Page = () => {
             const _public = node._public.checked;
             const _title = node._title.value;
             const _message = node._message.value;
-            createMessage({
-              variables: { record: { public: _public, title: _title, message: _message } },
-            }).then(() => {
-              refetch();
-            });
+            createMessage({ record: { public: _public, title: _title, message: _message } }).then(
+              () => {
+                refetch({ requestPolicy: 'network-only' });
+              }
+            );
           }}
         >
           <button type="submit">Send</button>
@@ -102,7 +94,7 @@ const Page = () => {
       <div>
         <button
           onClick={() => {
-            refetch();
+            refetch({ requestPolicy: 'network-only' });
           }}
         >
           Reload

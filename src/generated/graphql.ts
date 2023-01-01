@@ -1,11 +1,11 @@
-import { gql } from '@apollo/client';
-import * as Apollo from '@apollo/client';
+import gql from 'graphql-tag';
+import * as Urql from 'urql';
 export type Maybe<T> = T | null;
 export type InputMaybe<T> = Maybe<T>;
 export type Exact<T extends { [key: string]: unknown }> = { [K in keyof T]: T[K] };
 export type MakeOptional<T, K extends keyof T> = Omit<T, K> & { [SubKey in K]?: Maybe<T[SubKey]> };
 export type MakeMaybe<T, K extends keyof T> = Omit<T, K> & { [SubKey in K]: Maybe<T[SubKey]> };
-const defaultOptions = {} as const;
+export type Omit<T, K extends keyof T> = Pick<T, Exclude<keyof T, K>>;
 /** All built-in and custom scalars, mapped to their actual values */
 export type Scalars = {
   ID: string;
@@ -127,22 +127,27 @@ export type Mutation = {
   messageUpdateById?: Maybe<UpdateByIdMessagePayload>;
 };
 
+
 export type MutationCreateFileArgs = {
   file: Scalars['Upload'];
 };
+
 
 export type MutationLoginArgs = {
   identity: Scalars['String'];
   password: Scalars['String'];
 };
 
+
 export type MutationMessageCreateArgs = {
   record: CreateOneMessageInput;
 };
 
+
 export type MutationMessageRemoveByIdArgs = {
   _id: Scalars['MongoID'];
 };
+
 
 export type MutationMessageUpdateByIdArgs = {
   _id: Scalars['MongoID'];
@@ -155,9 +160,11 @@ export type Query = {
   messageMany: Array<Message>;
 };
 
+
 export type QueryMessageByIdArgs = {
   _id: Scalars['MongoID'];
 };
+
 
 export type QueryMessageManyArgs = {
   filter?: InputMaybe<FilterFindManyMessageInput>;
@@ -188,7 +195,7 @@ export enum SortFindManyMessageInput {
   UpdatedatAsc = 'UPDATEDAT_ASC',
   UpdatedatDesc = 'UPDATEDAT_DESC',
   IdAsc = '_ID_ASC',
-  IdDesc = '_ID_DESC',
+  IdDesc = '_ID_DESC'
 }
 
 export type UpdateByIdMessageInput = {
@@ -240,273 +247,99 @@ export type CreateFileMutationVariables = Exact<{
   file: Scalars['Upload'];
 }>;
 
-export type CreateFileMutation = { __typename?: 'Mutation'; createFile: string };
+
+export type CreateFileMutation = { __typename?: 'Mutation', createFile: string };
 
 export type LoginMutationVariables = Exact<{
   identity: Scalars['String'];
   password: Scalars['String'];
 }>;
 
-export type LoginMutation = { __typename?: 'Mutation'; login?: string | null };
 
-export type LogoutMutationVariables = Exact<{ [key: string]: never }>;
+export type LoginMutation = { __typename?: 'Mutation', login?: string | null };
 
-export type LogoutMutation = { __typename?: 'Mutation'; logout: string };
+export type LogoutMutationVariables = Exact<{ [key: string]: never; }>;
+
+
+export type LogoutMutation = { __typename?: 'Mutation', logout: string };
 
 export type MessageManyQueryVariables = Exact<{
   filter?: InputMaybe<FilterFindManyMessageInput>;
 }>;
 
-export type MessageManyQuery = {
-  __typename?: 'Query';
-  messageMany: Array<{
-    __typename?: 'Message';
-    _id: any;
-    public: boolean;
-    title: string;
-    message: string;
-    createdAt?: any | null;
-    updatedAt?: any | null;
-    user: { __typename?: 'User'; _id: any; name: string };
-  }>;
-};
+
+export type MessageManyQuery = { __typename?: 'Query', messageMany: Array<{ __typename?: 'Message', _id: any, public: boolean, title: string, message: string, createdAt?: any | null, updatedAt?: any | null, user: { __typename?: 'User', _id: any, name: string } }> };
 
 export type MessageCreateMutationVariables = Exact<{
   record: CreateOneMessageInput;
 }>;
 
-export type MessageCreateMutation = {
-  __typename?: 'Mutation';
-  messageCreate?: {
-    __typename?: 'CreateOneMessagePayload';
-    record?: {
-      __typename?: 'Message';
-      _id: any;
-      public: boolean;
-      title: string;
-      message: string;
-      createdAt?: any | null;
-      updatedAt?: any | null;
-    } | null;
-  } | null;
-};
+
+export type MessageCreateMutation = { __typename?: 'Mutation', messageCreate?: { __typename?: 'CreateOneMessagePayload', record?: { __typename?: 'Message', _id: any, public: boolean, title: string, message: string, createdAt?: any | null, updatedAt?: any | null } | null } | null };
+
 
 export const CreateFileDocument = gql`
-  mutation CreateFile($file: Upload!) {
-    createFile(file: $file)
-  }
-`;
-export type CreateFileMutationFn = Apollo.MutationFunction<
-  CreateFileMutation,
-  CreateFileMutationVariables
->;
-
-/**
- * __useCreateFileMutation__
- *
- * To run a mutation, you first call `useCreateFileMutation` within a React component and pass it any options that fit your needs.
- * When your component renders, `useCreateFileMutation` returns a tuple that includes:
- * - A mutate function that you can call at any time to execute the mutation
- * - An object with fields that represent the current status of the mutation's execution
- *
- * @param baseOptions options that will be passed into the mutation, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options-2;
- *
- * @example
- * const [createFileMutation, { data, loading, error }] = useCreateFileMutation({
- *   variables: {
- *      file: // value for 'file'
- *   },
- * });
- */
-export function useCreateFileMutation(
-  baseOptions?: Apollo.MutationHookOptions<CreateFileMutation, CreateFileMutationVariables>
-) {
-  const options = { ...defaultOptions, ...baseOptions };
-  return Apollo.useMutation<CreateFileMutation, CreateFileMutationVariables>(
-    CreateFileDocument,
-    options
-  );
+    mutation CreateFile($file: Upload!) {
+  createFile(file: $file)
 }
-export type CreateFileMutationHookResult = ReturnType<typeof useCreateFileMutation>;
-export type CreateFileMutationResult = Apollo.MutationResult<CreateFileMutation>;
-export type CreateFileMutationOptions = Apollo.BaseMutationOptions<
-  CreateFileMutation,
-  CreateFileMutationVariables
->;
+    `;
+
+export function useCreateFileMutation() {
+  return Urql.useMutation<CreateFileMutation, CreateFileMutationVariables>(CreateFileDocument);
+};
 export const LoginDocument = gql`
-  mutation Login($identity: String!, $password: String!) {
-    login(identity: $identity, password: $password)
-  }
-`;
-export type LoginMutationFn = Apollo.MutationFunction<LoginMutation, LoginMutationVariables>;
-
-/**
- * __useLoginMutation__
- *
- * To run a mutation, you first call `useLoginMutation` within a React component and pass it any options that fit your needs.
- * When your component renders, `useLoginMutation` returns a tuple that includes:
- * - A mutate function that you can call at any time to execute the mutation
- * - An object with fields that represent the current status of the mutation's execution
- *
- * @param baseOptions options that will be passed into the mutation, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options-2;
- *
- * @example
- * const [loginMutation, { data, loading, error }] = useLoginMutation({
- *   variables: {
- *      identity: // value for 'identity'
- *      password: // value for 'password'
- *   },
- * });
- */
-export function useLoginMutation(
-  baseOptions?: Apollo.MutationHookOptions<LoginMutation, LoginMutationVariables>
-) {
-  const options = { ...defaultOptions, ...baseOptions };
-  return Apollo.useMutation<LoginMutation, LoginMutationVariables>(LoginDocument, options);
+    mutation Login($identity: String!, $password: String!) {
+  login(identity: $identity, password: $password)
 }
-export type LoginMutationHookResult = ReturnType<typeof useLoginMutation>;
-export type LoginMutationResult = Apollo.MutationResult<LoginMutation>;
-export type LoginMutationOptions = Apollo.BaseMutationOptions<
-  LoginMutation,
-  LoginMutationVariables
->;
+    `;
+
+export function useLoginMutation() {
+  return Urql.useMutation<LoginMutation, LoginMutationVariables>(LoginDocument);
+};
 export const LogoutDocument = gql`
-  mutation Logout {
-    logout
-  }
-`;
-export type LogoutMutationFn = Apollo.MutationFunction<LogoutMutation, LogoutMutationVariables>;
-
-/**
- * __useLogoutMutation__
- *
- * To run a mutation, you first call `useLogoutMutation` within a React component and pass it any options that fit your needs.
- * When your component renders, `useLogoutMutation` returns a tuple that includes:
- * - A mutate function that you can call at any time to execute the mutation
- * - An object with fields that represent the current status of the mutation's execution
- *
- * @param baseOptions options that will be passed into the mutation, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options-2;
- *
- * @example
- * const [logoutMutation, { data, loading, error }] = useLogoutMutation({
- *   variables: {
- *   },
- * });
- */
-export function useLogoutMutation(
-  baseOptions?: Apollo.MutationHookOptions<LogoutMutation, LogoutMutationVariables>
-) {
-  const options = { ...defaultOptions, ...baseOptions };
-  return Apollo.useMutation<LogoutMutation, LogoutMutationVariables>(LogoutDocument, options);
+    mutation Logout {
+  logout
 }
-export type LogoutMutationHookResult = ReturnType<typeof useLogoutMutation>;
-export type LogoutMutationResult = Apollo.MutationResult<LogoutMutation>;
-export type LogoutMutationOptions = Apollo.BaseMutationOptions<
-  LogoutMutation,
-  LogoutMutationVariables
->;
+    `;
+
+export function useLogoutMutation() {
+  return Urql.useMutation<LogoutMutation, LogoutMutationVariables>(LogoutDocument);
+};
 export const MessageManyDocument = gql`
-  query MessageMany($filter: FilterFindManyMessageInput) {
-    messageMany(filter: $filter, sort: CREATEDAT_DESC) {
+    query MessageMany($filter: FilterFindManyMessageInput) {
+  messageMany(filter: $filter, sort: CREATEDAT_DESC) {
+    _id
+    public
+    title
+    message
+    createdAt
+    updatedAt
+    user {
+      _id
+      name
+    }
+  }
+}
+    `;
+
+export function useMessageManyQuery(options?: Omit<Urql.UseQueryArgs<MessageManyQueryVariables>, 'query'>) {
+  return Urql.useQuery<MessageManyQuery, MessageManyQueryVariables>({ query: MessageManyDocument, ...options });
+};
+export const MessageCreateDocument = gql`
+    mutation MessageCreate($record: CreateOneMessageInput!) {
+  messageCreate(record: $record) {
+    record {
       _id
       public
       title
       message
       createdAt
       updatedAt
-      user {
-        _id
-        name
-      }
     }
   }
-`;
+}
+    `;
 
-/**
- * __useMessageManyQuery__
- *
- * To run a query within a React component, call `useMessageManyQuery` and pass it any options that fit your needs.
- * When your component renders, `useMessageManyQuery` returns an object from Apollo Client that contains loading, error, and data properties
- * you can use to render your UI.
- *
- * @param baseOptions options that will be passed into the query, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options;
- *
- * @example
- * const { data, loading, error } = useMessageManyQuery({
- *   variables: {
- *      filter: // value for 'filter'
- *   },
- * });
- */
-export function useMessageManyQuery(
-  baseOptions?: Apollo.QueryHookOptions<MessageManyQuery, MessageManyQueryVariables>
-) {
-  const options = { ...defaultOptions, ...baseOptions };
-  return Apollo.useQuery<MessageManyQuery, MessageManyQueryVariables>(MessageManyDocument, options);
-}
-export function useMessageManyLazyQuery(
-  baseOptions?: Apollo.LazyQueryHookOptions<MessageManyQuery, MessageManyQueryVariables>
-) {
-  const options = { ...defaultOptions, ...baseOptions };
-  return Apollo.useLazyQuery<MessageManyQuery, MessageManyQueryVariables>(
-    MessageManyDocument,
-    options
-  );
-}
-export type MessageManyQueryHookResult = ReturnType<typeof useMessageManyQuery>;
-export type MessageManyLazyQueryHookResult = ReturnType<typeof useMessageManyLazyQuery>;
-export type MessageManyQueryResult = Apollo.QueryResult<
-  MessageManyQuery,
-  MessageManyQueryVariables
->;
-export const MessageCreateDocument = gql`
-  mutation MessageCreate($record: CreateOneMessageInput!) {
-    messageCreate(record: $record) {
-      record {
-        _id
-        public
-        title
-        message
-        createdAt
-        updatedAt
-      }
-    }
-  }
-`;
-export type MessageCreateMutationFn = Apollo.MutationFunction<
-  MessageCreateMutation,
-  MessageCreateMutationVariables
->;
-
-/**
- * __useMessageCreateMutation__
- *
- * To run a mutation, you first call `useMessageCreateMutation` within a React component and pass it any options that fit your needs.
- * When your component renders, `useMessageCreateMutation` returns a tuple that includes:
- * - A mutate function that you can call at any time to execute the mutation
- * - An object with fields that represent the current status of the mutation's execution
- *
- * @param baseOptions options that will be passed into the mutation, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options-2;
- *
- * @example
- * const [messageCreateMutation, { data, loading, error }] = useMessageCreateMutation({
- *   variables: {
- *      record: // value for 'record'
- *   },
- * });
- */
-export function useMessageCreateMutation(
-  baseOptions?: Apollo.MutationHookOptions<MessageCreateMutation, MessageCreateMutationVariables>
-) {
-  const options = { ...defaultOptions, ...baseOptions };
-  return Apollo.useMutation<MessageCreateMutation, MessageCreateMutationVariables>(
-    MessageCreateDocument,
-    options
-  );
-}
-export type MessageCreateMutationHookResult = ReturnType<typeof useMessageCreateMutation>;
-export type MessageCreateMutationResult = Apollo.MutationResult<MessageCreateMutation>;
-export type MessageCreateMutationOptions = Apollo.BaseMutationOptions<
-  MessageCreateMutation,
-  MessageCreateMutationVariables
->;
+export function useMessageCreateMutation() {
+  return Urql.useMutation<MessageCreateMutation, MessageCreateMutationVariables>(MessageCreateDocument);
+};
