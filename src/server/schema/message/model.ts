@@ -1,8 +1,5 @@
-import { schemaComposer } from 'graphql-compose';
-import { composeWithMongoose } from 'graphql-compose-mongoose';
 import { model, Schema, Types } from 'mongoose';
-import { requirePermissions } from '../../libs/requirePermissions';
-import { IUser, UserModel } from '../user/model';
+import { IUser } from '../user/model';
 
 /**
  * TypeScript用型情報
@@ -28,6 +25,14 @@ const schema = new Schema<IMessage>(
     user: {
       type: Types.ObjectId,
       ref: 'User',
+      required: true,
+    },
+    createdAt: {
+      type: Date,
+      required: true,
+    },
+    updatedAt: {
+      type: Date,
       required: true,
     },
   },

@@ -1,0 +1,3 @@
+mutation CreateFile($file: Upload!) {
+  createFile(file: $file)
+}

@@ -1,0 +1,7 @@
+mutation Login($identity: String!, $password: String!) {
+  login(identity: $identity, password: $password)
+}
+
+mutation Logout {
+  logout
+}

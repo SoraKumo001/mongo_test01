@@ -1,0 +1,277 @@
+type ValidationError implements ErrorInterface {
+  """Combined error message from all validators"""
+  message: String
+
+  """List of validator errors"""
+  errors: [ValidatorError!]
+}
+
+interface ErrorInterface {
+  """Generic error message"""
+  message: String
+}
+
+type ValidatorError {
+  """Validation error message"""
+  message: String
+
+  """Source of the validation error from the model path"""
+  path: String
+
+  """Field value which occurs the validation error"""
+  value: JSON
+
+  """
+  Input record idx in array which occurs the validation error. This `idx` is useful for createMany operation. For singular operations it always be 0. For *Many operations `idx` represents record index in array received from user.
+  """
+  idx: Int!
+}
+
+"""
+The `JSON` scalar type represents JSON values as specified by [ECMA-404](http://www.ecma-international.org/publications/files/ECMA-ST/ECMA-404.pdf).
+"""
+scalar JSON
+
+type MongoError implements ErrorInterface {
+  """MongoDB error message"""
+  message: String
+
+  """MongoDB error code"""
+  code: Int
+}
+
+type RuntimeError implements ErrorInterface {
+  """Runtime error message"""
+  message: String
+}
+
+type Query {
+  messageById(_id: MongoID!): Message
+  messageMany(
+    """Filter by fields"""
+    filter: FilterFindManyMessageInput
+    skip: Int
+    limit: Int = 100
+    sort: SortFindManyMessageInput
+  ): [Message!]!
+  fileById(_id: MongoID!): File
+  fileMany(
+    """Filter by fields"""
+    filter: FilterFindManyFileInput
+    skip: Int
+    limit: Int = 100
+    sort: SortFindManyFileInput
+  ): [File!]!
+}
+
+type Message {
+  public: Boolean!
+  title: String!
+  message: String!
+  user: User!
+  createdAt: Date!
+  updatedAt: Date!
+  _id: MongoID!
+}
+
+type User {
+  identity: String!
+  name: String!
+  _id: MongoID!
+}
+
+"""
+The `ID` scalar type represents a unique MongoDB identifier in collection. MongoDB by default use 12-byte ObjectId value (https://docs.mongodb.com/manual/reference/bson-types/#objectid). But MongoDB also may accepts string or integer as correct values for _id field.
+"""
+scalar MongoID
+
+scalar Date
+
+""""""
+input FilterFindManyMessageInput {
+  public: Boolean
+  title: String
+  message: String
+  _id: MongoID
+
+  """List of *indexed* fields that can be filtered via operators."""
+  _operators: FilterFindManyMessageOperatorsInput
+  OR: [FilterFindManyMessageInput!]
+  AND: [FilterFindManyMessageInput!]
+}
+
+"""For performance reason this type contains only *indexed* fields."""
+input FilterFindManyMessageOperatorsInput {
+  _id: FilterFindManyMessage_idOperatorsInput
+}
+
+input FilterFindManyMessage_idOperatorsInput {
+  gt: MongoID
+  gte: MongoID
+  lt: MongoID
+  lte: MongoID
+  ne: MongoID
+  in: [MongoID]
+  nin: [MongoID]
+  exists: Boolean
+}
+
+enum SortFindManyMessageInput {
+  _ID_ASC
+  _ID_DESC
+  CREATEDAT_ASC
+  CREATEDAT_DESC
+  UPDATEDAT_ASC
+  UPDATEDAT_DESC
+}
+
+type File {
+  name: String!
+  type: String!
+  value: Buffer!
+  _id: MongoID!
+  createdAt: Date
+  updatedAt: Date
+}
+
+scalar Buffer
+
+""""""
+input FilterFindManyFileInput {
+  name: String
+  type: String
+  value: Buffer
+  _id: MongoID
+  createdAt: Date
+  updatedAt: Date
+
+  """List of *indexed* fields that can be filtered via operators."""
+  _operators: FilterFindManyFileOperatorsInput
+  OR: [FilterFindManyFileInput!]
+  AND: [FilterFindManyFileInput!]
+}
+
+"""For performance reason this type contains only *indexed* fields."""
+input FilterFindManyFileOperatorsInput {
+  _id: FilterFindManyFile_idOperatorsInput
+  createdAt: FilterFindManyFileCreatedAtOperatorsInput
+  updatedAt: FilterFindManyFileUpdatedAtOperatorsInput
+}
+
+input FilterFindManyFile_idOperatorsInput {
+  gt: MongoID
+  gte: MongoID
+  lt: MongoID
+  lte: MongoID
+  ne: MongoID
+  in: [MongoID]
+  nin: [MongoID]
+  exists: Boolean
+}
+
+input FilterFindManyFileCreatedAtOperatorsInput {
+  gt: Date
+  gte: Date
+  lt: Date
+  lte: Date
+  ne: Date
+  in: [Date]
+  nin: [Date]
+  exists: Boolean
+}
+
+input FilterFindManyFileUpdatedAtOperatorsInput {
+  gt: Date
+  gte: Date
+  lt: Date
+  lte: Date
+  ne: Date
+  in: [Date]
+  nin: [Date]
+  exists: Boolean
+}
+
+enum SortFindManyFileInput {
+  _ID_ASC
+  _ID_DESC
+  CREATEDAT_ASC
+  CREATEDAT_DESC
+  UPDATEDAT_ASC
+  UPDATEDAT_DESC
+}
+
+type Mutation {
+  login(identity: String!, password: String!): String
+  logout: String!
+
+  """
+  Create one document with mongoose defaults, setters, hooks and validation
+  """
+  messageCreate(record: CreateOneMessageInput!): CreateOneMessagePayload
+
+  """
+  Update one document: 1) Retrieve one document by findById. 2) Apply updates to mongoose document. 3) Mongoose applies defaults, setters, hooks and validation. 4) And save it.
+  """
+  messageUpdateById(_id: MongoID!, record: UpdateByIdMessageInput!): UpdateByIdMessagePayload
+
+  """
+  Remove one document: 1) Retrieve one document and remove with hooks via findByIdAndRemove. 2) Return removed document.
+  """
+  messageRemoveById(_id: MongoID!): RemoveByIdMessagePayload
+  createFile(file: Upload!): String!
+}
+
+type CreateOneMessagePayload {
+  """Document ID"""
+  recordId: MongoID
+
+  """Created document"""
+  record: Message
+
+  """
+  Error that may occur during operation. If you request this field in GraphQL query, you will receive typed error in payload; otherwise error will be provided in root `errors` field of GraphQL response.
+  """
+  error: ErrorInterface
+}
+
+""""""
+input CreateOneMessageInput {
+  public: Boolean!
+  title: String!
+  message: String!
+}
+
+type UpdateByIdMessagePayload {
+  """Document ID"""
+  recordId: MongoID
+
+  """Updated document"""
+  record: Message
+
+  """
+  Error that may occur during operation. If you request this field in GraphQL query, you will receive typed error in payload; otherwise error will be provided in root `errors` field of GraphQL response.
+  """
+  error: ErrorInterface
+}
+
+""""""
+input UpdateByIdMessageInput {
+  public: Boolean
+  title: String
+  message: String
+}
+
+type RemoveByIdMessagePayload {
+  """Document ID"""
+  recordId: MongoID
+
+  """Removed document"""
+  record: Message
+
+  """
+  Error that may occur during operation. If you request this field in GraphQL query, you will receive typed error in payload; otherwise error will be provided in root `errors` field of GraphQL response.
+  """
+  error: ErrorInterface
+}
+
+scalar Upload

@@ -6,7 +6,7 @@ import { IMessage, messageModel } from './model';
 
 export const initMessage = () => {
   const Message = composeWithMongoose(messageModel, {
-    inputType: { removeFields: ['user'] },
+    inputType: { removeFields: ['user', 'createdAt', 'updatedAt'] },
   });
 
   schemaComposer.Query.addFields({

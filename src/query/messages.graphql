@@ -1,0 +1,27 @@
+query MessageMany($filter: FilterFindManyMessageInput) {
+  messageMany(filter: $filter, sort: CREATEDAT_DESC) {
+    _id
+    public
+    title
+    message
+    createdAt
+    updatedAt
+    user {
+      _id
+      name
+    }
+  }
+}
+
+mutation MessageCreate($record: CreateOneMessageInput!) {
+  messageCreate(record: $record) {
+    record {
+      _id
+      public
+      title
+      message
+      createdAt
+      updatedAt
+    }
+  }
+}

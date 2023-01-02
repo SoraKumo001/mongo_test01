@@ -13,18 +13,19 @@ export type Scalars = {
   Boolean: boolean;
   Int: number;
   Float: number;
+  Buffer: any;
   Date: any;
+  /** The `JSON` scalar type represents JSON values as specified by [ECMA-404](http://www.ecma-international.org/publications/files/ECMA-ST/ECMA-404.pdf). */
   JSON: any;
+  /** The `ID` scalar type represents a unique MongoDB identifier in collection. MongoDB by default use 12-byte ObjectId value (https://docs.mongodb.com/manual/reference/bson-types/#objectid). But MongoDB also may accepts string or integer as correct values for _id field. */
   MongoID: any;
   Upload: any;
 };
 
 export type CreateOneMessageInput = {
-  createdAt?: InputMaybe<Scalars['Date']>;
   message: Scalars['String'];
   public: Scalars['Boolean'];
   title: Scalars['String'];
-  updatedAt?: InputMaybe<Scalars['Date']>;
 };
 
 export type CreateOneMessagePayload = {
@@ -42,7 +43,17 @@ export type ErrorInterface = {
   message?: Maybe<Scalars['String']>;
 };
 
-export type FilterFindManyMessageCreatedAtOperatorsInput = {
+export type File = {
+  __typename?: 'File';
+  _id: Scalars['MongoID'];
+  createdAt?: Maybe<Scalars['Date']>;
+  name: Scalars['String'];
+  type: Scalars['String'];
+  updatedAt?: Maybe<Scalars['Date']>;
+  value: Scalars['Buffer'];
+};
+
+export type FilterFindManyFileCreatedAtOperatorsInput = {
   exists?: InputMaybe<Scalars['Boolean']>;
   gt?: InputMaybe<Scalars['Date']>;
   gte?: InputMaybe<Scalars['Date']>;
@@ -51,6 +62,48 @@ export type FilterFindManyMessageCreatedAtOperatorsInput = {
   lte?: InputMaybe<Scalars['Date']>;
   ne?: InputMaybe<Scalars['Date']>;
   nin?: InputMaybe<Array<InputMaybe<Scalars['Date']>>>;
+};
+
+export type FilterFindManyFileInput = {
+  AND?: InputMaybe<Array<FilterFindManyFileInput>>;
+  OR?: InputMaybe<Array<FilterFindManyFileInput>>;
+  _id?: InputMaybe<Scalars['MongoID']>;
+  /** List of *indexed* fields that can be filtered via operators. */
+  _operators?: InputMaybe<FilterFindManyFileOperatorsInput>;
+  createdAt?: InputMaybe<Scalars['Date']>;
+  name?: InputMaybe<Scalars['String']>;
+  type?: InputMaybe<Scalars['String']>;
+  updatedAt?: InputMaybe<Scalars['Date']>;
+  value?: InputMaybe<Scalars['Buffer']>;
+};
+
+/** For performance reason this type contains only *indexed* fields. */
+export type FilterFindManyFileOperatorsInput = {
+  _id?: InputMaybe<FilterFindManyFile_IdOperatorsInput>;
+  createdAt?: InputMaybe<FilterFindManyFileCreatedAtOperatorsInput>;
+  updatedAt?: InputMaybe<FilterFindManyFileUpdatedAtOperatorsInput>;
+};
+
+export type FilterFindManyFileUpdatedAtOperatorsInput = {
+  exists?: InputMaybe<Scalars['Boolean']>;
+  gt?: InputMaybe<Scalars['Date']>;
+  gte?: InputMaybe<Scalars['Date']>;
+  in?: InputMaybe<Array<InputMaybe<Scalars['Date']>>>;
+  lt?: InputMaybe<Scalars['Date']>;
+  lte?: InputMaybe<Scalars['Date']>;
+  ne?: InputMaybe<Scalars['Date']>;
+  nin?: InputMaybe<Array<InputMaybe<Scalars['Date']>>>;
+};
+
+export type FilterFindManyFile_IdOperatorsInput = {
+  exists?: InputMaybe<Scalars['Boolean']>;
+  gt?: InputMaybe<Scalars['MongoID']>;
+  gte?: InputMaybe<Scalars['MongoID']>;
+  in?: InputMaybe<Array<InputMaybe<Scalars['MongoID']>>>;
+  lt?: InputMaybe<Scalars['MongoID']>;
+  lte?: InputMaybe<Scalars['MongoID']>;
+  ne?: InputMaybe<Scalars['MongoID']>;
+  nin?: InputMaybe<Array<InputMaybe<Scalars['MongoID']>>>;
 };
 
 export type FilterFindManyMessageInput = {
@@ -59,29 +112,14 @@ export type FilterFindManyMessageInput = {
   _id?: InputMaybe<Scalars['MongoID']>;
   /** List of *indexed* fields that can be filtered via operators. */
   _operators?: InputMaybe<FilterFindManyMessageOperatorsInput>;
-  createdAt?: InputMaybe<Scalars['Date']>;
   message?: InputMaybe<Scalars['String']>;
   public?: InputMaybe<Scalars['Boolean']>;
   title?: InputMaybe<Scalars['String']>;
-  updatedAt?: InputMaybe<Scalars['Date']>;
 };
 
 /** For performance reason this type contains only *indexed* fields. */
 export type FilterFindManyMessageOperatorsInput = {
   _id?: InputMaybe<FilterFindManyMessage_IdOperatorsInput>;
-  createdAt?: InputMaybe<FilterFindManyMessageCreatedAtOperatorsInput>;
-  updatedAt?: InputMaybe<FilterFindManyMessageUpdatedAtOperatorsInput>;
-};
-
-export type FilterFindManyMessageUpdatedAtOperatorsInput = {
-  exists?: InputMaybe<Scalars['Boolean']>;
-  gt?: InputMaybe<Scalars['Date']>;
-  gte?: InputMaybe<Scalars['Date']>;
-  in?: InputMaybe<Array<InputMaybe<Scalars['Date']>>>;
-  lt?: InputMaybe<Scalars['Date']>;
-  lte?: InputMaybe<Scalars['Date']>;
-  ne?: InputMaybe<Scalars['Date']>;
-  nin?: InputMaybe<Array<InputMaybe<Scalars['Date']>>>;
 };
 
 export type FilterFindManyMessage_IdOperatorsInput = {
@@ -98,11 +136,11 @@ export type FilterFindManyMessage_IdOperatorsInput = {
 export type Message = {
   __typename?: 'Message';
   _id: Scalars['MongoID'];
-  createdAt?: Maybe<Scalars['Date']>;
+  createdAt: Scalars['Date'];
   message: Scalars['String'];
   public: Scalars['Boolean'];
   title: Scalars['String'];
-  updatedAt?: Maybe<Scalars['Date']>;
+  updatedAt: Scalars['Date'];
   user: User;
 };
 
@@ -156,8 +194,23 @@ export type MutationMessageUpdateByIdArgs = {
 
 export type Query = {
   __typename?: 'Query';
+  fileById?: Maybe<File>;
+  fileMany: Array<File>;
   messageById?: Maybe<Message>;
   messageMany: Array<Message>;
+};
+
+
+export type QueryFileByIdArgs = {
+  _id: Scalars['MongoID'];
+};
+
+
+export type QueryFileManyArgs = {
+  filter?: InputMaybe<FilterFindManyFileInput>;
+  limit?: InputMaybe<Scalars['Int']>;
+  skip?: InputMaybe<Scalars['Int']>;
+  sort?: InputMaybe<SortFindManyFileInput>;
 };
 
 
@@ -189,6 +242,15 @@ export type RuntimeError = ErrorInterface & {
   message?: Maybe<Scalars['String']>;
 };
 
+export enum SortFindManyFileInput {
+  CreatedatAsc = 'CREATEDAT_ASC',
+  CreatedatDesc = 'CREATEDAT_DESC',
+  UpdatedatAsc = 'UPDATEDAT_ASC',
+  UpdatedatDesc = 'UPDATEDAT_DESC',
+  IdAsc = '_ID_ASC',
+  IdDesc = '_ID_DESC'
+}
+
 export enum SortFindManyMessageInput {
   CreatedatAsc = 'CREATEDAT_ASC',
   CreatedatDesc = 'CREATEDAT_DESC',
@@ -199,11 +261,9 @@ export enum SortFindManyMessageInput {
 }
 
 export type UpdateByIdMessageInput = {
-  createdAt?: InputMaybe<Scalars['Date']>;
   message?: InputMaybe<Scalars['String']>;
   public?: InputMaybe<Scalars['Boolean']>;
   title?: InputMaybe<Scalars['String']>;
-  updatedAt?: InputMaybe<Scalars['Date']>;
 };
 
 export type UpdateByIdMessagePayload = {
@@ -268,14 +328,14 @@ export type MessageManyQueryVariables = Exact<{
 }>;
 
 
-export type MessageManyQuery = { __typename?: 'Query', messageMany: Array<{ __typename?: 'Message', _id: any, public: boolean, title: string, message: string, createdAt?: any | null, updatedAt?: any | null, user: { __typename?: 'User', _id: any, name: string } }> };
+export type MessageManyQuery = { __typename?: 'Query', messageMany: Array<{ __typename?: 'Message', _id: any, public: boolean, title: string, message: string, createdAt: any, updatedAt: any, user: { __typename?: 'User', _id: any, name: string } }> };
 
 export type MessageCreateMutationVariables = Exact<{
   record: CreateOneMessageInput;
 }>;
 
 
-export type MessageCreateMutation = { __typename?: 'Mutation', messageCreate?: { __typename?: 'CreateOneMessagePayload', record?: { __typename?: 'Message', _id: any, public: boolean, title: string, message: string, createdAt?: any | null, updatedAt?: any | null } | null } | null };
+export type MessageCreateMutation = { __typename?: 'Mutation', messageCreate?: { __typename?: 'CreateOneMessagePayload', record?: { __typename?: 'Message', _id: any, public: boolean, title: string, message: string, createdAt: any, updatedAt: any } | null } | null };
 
 
 export const CreateFileDocument = gql`
